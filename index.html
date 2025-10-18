@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>October Playlist</title>
+      <link href="style.css" rel="stylesheet"/>
+</head>
+<body>
+    <h1>October Playlist</h1>
+    <ul id="song-list">
+        <li><a href="/Music/MAVIN-RECORDS-Overdose-ft-Mavins-x-Crayon-x-Ayra-Starr-x-Ladipoe-x-Magixx-x-Boy-Spyce.mp3">Overdose</a></li>
+        <li><a href="/Music/Omah-Lay-Damn-Remix-ft-6lack-1.mp3">Damn</a></li>
+        <li><a href="/Music/Omah-Lay-How-to-luv.mp3">How to luv</a></li>
+        <li><a href="/Music/Omah-Lay-I.mp3">I</a></li>
+        <li><a href="/Music/Omah-Lay-Purple-song.mp3">Purple</a></li>
+        <li><a href="/Music/Omah-Lay-Recognize.mp3">Recognize</a></li>
+        <li><a href="/Music/Omah-Lay-Safe-haven.mp3">Safe Haven</a></li>
+        <li><a href="/Music/Omah-Lay-Tell-everybody-ft-Tay-Iwar.mp3">Tell Everybody</a></li>
+        <li><a href="/Music/Omah-Lay-Temptations.mp3">Temptations</a></li>
+        <li><a href="/Music/Rema-Calm-Down.mp3">Calm Down</a></li>
+        <li><a href="/Music/Joeboy_-_Baby.mp3">Baby</a></li>
+        <li><a href="/Music/FAVE_-_Baby_Riddim.mp3">Baby Riddim</a></li>
+        <li><a href="/Music/Camidoh-Sugarcane-Remix-feat-King-promise-Mayorkun--Darkoo.mp3">Sugarcane</a></li>
+        <li><a href="/Music/Ayra_Starr_-_Bloody_Samaritan.mp3">Bloody Samaritan</a></li>
+        <li><a href="/Music/Bella_Shmurda_-_Far_Away.mp3">Far Away</a></li>
+
+<style>body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: black;
+  color: white;
+}
+
+#song-list {
+    list-style: horizontal;
+    padding: 0;
+    margin: 0;
+}
+
+#song-list li {
+    padding: 10px;
+    border-bottom: 1px solid white;
+    cursor: pointer;
+}
+
+#song-list li:hover {
+    background-color: black;
+}
+</style>
+
+    <script>const songList = document.getElementById('song-list');
+const audio = document.getElementById('audio');
+const playPauseButton = document.getElementById('play-pause-button');
+
+let currentSong = null;
+
+fetch('/music')
+  .then(response => response.json())
+  .then(files => {
+    files.forEach(file => {
+      const songItem = document.createElement('li');
+      songItem.textContent = file;
+      songItem.addEventListener('click', () => {
+        currentSong = file;
+        audio.src = `/music/${file}`;
+        audio.play();
+        playPauseButton.textContent = 'Pause';
+      });
+      songList.appendChild(songItem);
+    });
+  });
+
+playPauseButton.addEventListener('click', () => {
+  if (audio.paused) {
+    audio.play();
+    playPauseButton.textContent = 'Pause';
+  } else {
+    audio.pause();
+    playPauseButton.textContent = 'Play';
+  }
+});
+
+
+const express = require('express');
+const app = express();
+const fs = require('fs');
+const path = require('path');
+
+app.use(express.static('public'));
+
+app.get('/music', (req, res) => {
+  fs.readdir('./music', (err, files) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error reading music directory');
+    } else {
+      res.json(files);
+    }
+  });
+});
+
+app.use('/music', express.static('music'));
+
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
+
+</script>
+</body>
+</html>
