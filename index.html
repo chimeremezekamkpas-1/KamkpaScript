@@ -125,21 +125,19 @@ footer-text = '© 2025 KamkpaScript'
     }
     
     function savePreview() {
-  const frame = document.getElementById('outputFrame'); // your preview iframe
+  const frame = document.getElementById('outputFrame');
   const html = frame.srcdoc;
 
-  // Create a Blob (HTML file)
-  const blob = new Blob([html], { type: 'text/html' });
+  // Create a downloadable KS file instead of HTML
+  const blob = new Blob([html], { type: 'text/plain' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
+  link.download = 'KamkpaPreview.ks'; // 🔥 changed extension here
 
-  // Default name (you can adjust)
-  link.download = 'KamkpaPreview.html';
   link.click();
-
-  // Cleanup
   URL.revokeObjectURL(link.href);
-  alert("✅ Preview saved as file successfully!");
+
+  alert("✅ Preview saved as .KS file successfully!");
 }
 
     /************************************
