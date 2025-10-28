@@ -55,7 +55,7 @@
     <button onclick="saveFile()">💾 Save</button>
     <button onclick="saveAsFile()">💾 Save As</button>
     <button onclick="document.getElementById('fileInput').click()">
-    <button onclick="savePreview()">💾 Save Preview</button>
+    <button onclick="savePreviewAsKS()">💾 Save Preview</button>
   </div>
 
   <input type="file" id="fileInput" accept=".ks">
@@ -124,20 +124,16 @@ footer-text = '© 2025 KamkpaScript'
       alert("✅ File saved successfully as " + filename);
     }
     
-    function savePreview() {
-  const frame = document.getElementById('outputFrame');
-  const html = frame.srcdoc;
-
-  // Create a downloadable KS file instead of HTML
-  const blob = new Blob([html], { type: 'text/plain' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'KamkpaPreview.ks'; // 🔥 changed extension here
-
-  link.click();
-  URL.revokeObjectURL(link.href);
-
-  alert("✅ Preview saved as .KS file successfully!");
+    function savePreviewAsKS() {
+  const preview = document.getElementById("preview").outerHTML;
+  const blob = new Blob([preview], { type: "text/plain;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "kamkpascript_preview.ks"; // ✅ saves as .ks file
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
 }
 
     /************************************
