@@ -124,17 +124,23 @@ footer-text = '© 2025 KamkpaScript'
       alert("✅ File saved successfully as " + filename);
     }
     
-function savePreviewAsKS() {
-  const preview = document.getElementById("preview").outerHTML;
-  const blob = new Blob([preview], { type: "text/plain;charset=utf-8" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "kamkpascript_preview.ks"; // 🟢 custom extension
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(a.href);
-}
+    function savePreview() {
+  const frame = document.getElementById('outputFrame'); // your preview iframe
+  const html = frame.srcdoc;
+
+  // Create a Blob (HTML file)
+  const blob = new Blob([html], { type: 'text/html' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+
+  // Default name (you can adjust)
+  link.download = 'KamkpaPreview.html';
+  link.click();
+
+  // Cleanup
+  URL.revokeObjectURL(link.href);
+  alert("✅ Preview saved as HTML file successfully!");
+}  
 
     /************************************
      * ▶️ KamkpaScript Interpreter Core
