@@ -55,6 +55,7 @@
     <button onclick="saveFile()">💾 Save</button>
     <button onclick="saveAsFile()">💾 Save As</button>
     <button onclick="document.getElementById('fileInput').click()">
+    <button onclick="savePreview()">💾 Save Preview</button>
   </div>
 
   <input type="file" id="fileInput" accept=".ks">
@@ -122,6 +123,24 @@ footer-text = '© 2025 KamkpaScript'
       URL.revokeObjectURL(link.href);
       alert("✅ File saved successfully as " + filename);
     }
+    
+    function savePreview() {
+  const frame = document.getElementById('outputFrame'); // your preview iframe
+  const html = frame.srcdoc;
+
+  // Create a Blob (HTML file)
+  const blob = new Blob([html], { type: 'text/html' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+
+  // Default name (you can adjust)
+  link.download = 'KamkpaPreview.html';
+  link.click();
+
+  // Cleanup
+  URL.revokeObjectURL(link.href);
+  alert("✅ Preview saved as file successfully!");
+}
 
     /************************************
      * ▶️ KamkpaScript Interpreter Core
