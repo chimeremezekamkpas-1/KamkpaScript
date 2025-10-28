@@ -124,12 +124,12 @@ footer-text = '© 2025 KamkpaScript'
       alert("✅ File saved successfully as " + filename);
     }
     
-    function savePreviewAsKS() {
+function savePreviewAsKS() {
   const preview = document.getElementById("preview").outerHTML;
   const blob = new Blob([preview], { type: "text/plain;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "kamkpascript_preview.ks"; // ✅ saves as .ks file
+  a.download = "kamkpascript_preview.ks"; // 🟢 custom extension
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
