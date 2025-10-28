@@ -1,113 +1,553 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>October Playlist</title>
-      <link href="style.css" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <title>KamkpaScript Interpreter</title>
+  <style>
+    body {
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+      background: #1e1e1e;
+      color: lime;
+    }
+    textarea {
+      width: 100%;
+      height: 180px;
+      font-size: 15px;
+      background: #111;
+      color: #0f0;
+      border: none;
+      padding: 10px;
+      outline: none;
+      resize: none;
+    }
+    .controls {
+      display: flex;
+      gap: 5px;
+    }
+    button {
+      flex: 1;
+      padding: 12px;
+      background: #00bfff;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    iframe {
+      width: 100%;
+      height: 400px;
+      border: none;
+      background: white;
+    }
+  </style>
 </head>
 <body>
-    <h1>October Playlist</h1>
-    <ul id="song-list">
-        <li><a href="/Music/MAVIN-RECORDS-Overdose-ft-Mavins-x-Crayon-x-Ayra-Starr-x-Ladipoe-x-Magixx-x-Boy-Spyce.mp3">Overdose</a></li>
-        <li><a href="/Music/Omah-Lay-Damn-Remix-ft-6lack-1.mp3">Damn</a></li>
-        <li><a href="/Music/Omah-Lay-How-to-luv.mp3">How to luv</a></li>
-        <li><a href="/Music/Omah-Lay-I.mp3">I</a></li>
-        <li><a href="/Music/Omah-Lay-Purple-song.mp3">Purple</a></li>
-        <li><a href="/Music/Omah-Lay-Recognize.mp3">Recognize</a></li>
-        <li><a href="/Music/Omah-Lay-Safe-haven.mp3">Safe Haven</a></li>
-        <li><a href="/Music/Omah-Lay-Tell-everybody-ft-Tay-Iwar.mp3">Tell Everybody</a></li>
-        <li><a href="/Music/Omah-Lay-Temptations.mp3">Temptations</a></li>
-        <li><a href="/Music/Rema-Calm-Down.mp3">Calm Down</a></li>
-        <li><a href="/Music/Joeboy_-_Baby.mp3">Baby</a></li>
-        <li><a href="/Music/FAVE_-_Baby_Riddim.mp3">Baby Riddim</a></li>
-        <li><a href="/Music/Camidoh-Sugarcane-Remix-feat-King-promise-Mayorkun--Darkoo.mp3">Sugarcane</a></li>
-        <li><a href="/Music/Ayra_Starr_-_Bloody_Samaritan.mp3">Bloody Samaritan</a></li>
-        <li><a href="/Music/Bella_Shmurda_-_Far_Away.mp3">Far Away</a></li>
 
-<style>body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background-color: black;
-  color: white;
-}
+  <h2 style="text-align:center;">💻 KamkpaScript (.ks) Editor</h2>
 
-#song-list {
-    list-style: horizontal;
-    padding: 0;
-    margin: 0;
-}
+  <div class="controls">
+    <button onclick="document.getElementById('fileInput').click()">📂 Load</button>
+    <button onclick="saveFile()">💾 Save</button>
+    <button onclick="saveAsFile()">💾 Save As</button>
+    <button onclick="document.getElementById('fileInput').click()">
+  </div>
 
-#song-list li {
-    padding: 10px;
-    border-bottom: 1px solid white;
-    cursor: pointer;
-}
+  <input type="file" id="fileInput" accept=".ks">
 
-#song-list li:hover {
-    background-color: black;
-}
-</style>
+  <textarea id="ksCode">
+p.type = 'web page'
+title = 'Day in a life'
+background-color = 'blue'
+header-color = 'white'
+header-text = 'Day in a life'
+paragraph = 'Welcome to my first KamkpaScript webpage.'
+footer-color = 'black'
+footer-text = '© 2025 KamkpaScript'
+  </textarea>
 
-    <script>const songList = document.getElementById('song-list');
-const audio = document.getElementById('audio');
-const playPauseButton = document.getElementById('play-pause-button');
+<button onclick="runKamkpaScript()">▶️ Run KamkpaScript</button>
+  <iframe id="outputFrame"></iframe>
 
-let currentSong = null;
+  <script>
+    /************************************
+     * 📁 Load .ks File from Storage
+     ************************************/
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-fetch('/music')
-  .then(response => response.json())
-  .then(files => {
-    files.forEach(file => {
-      const songItem = document.createElement('li');
-      songItem.textContent = file;
-      songItem.addEventListener('click', () => {
-        currentSong = file;
-        audio.src = `/music/${file}`;
-        audio.play();
-        playPauseButton.textContent = 'Pause';
-      });
-      songList.appendChild(songItem);
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('ksCode').value = e.target.result;
+      };
+      reader.readAsText(file);
     });
-  });
-
-playPauseButton.addEventListener('click', () => {
-  if (audio.paused) {
-    audio.play();
-    playPauseButton.textContent = 'Pause';
-  } else {
-    audio.pause();
-    playPauseButton.textContent = 'Play';
-  }
-});
-
-
-const express = require('express');
-const app = express();
-const fs = require('fs');
-const path = require('path');
-
-app.use(express.static('public'));
-
-app.get('/music', (req, res) => {
-  fs.readdir('./music', (err, files) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error reading music directory');
-    } else {
-      res.json(files);
+    
+    /************************************
+     * 💾 Save (using last file name)
+     ************************************/
+    function saveFile() {
+      const code = document.getElementById("ksCode").value;
+      downloadFile(lastFileName, code);
     }
-  });
-});
 
-app.use('/music', express.static('music'));
+    /************************************
+     * 💾 Save As (ask for new name)
+     ************************************/
+    function saveAsFile() {
+      const code = document.getElementById("ksCode").value;
+      const newName = prompt("Enter file name (without extension):", "myProject");
+      if (newName) {
+        lastFileName = newName.endsWith(".ks") ? newName : newName + ".ks";
+        downloadFile(lastFileName, code);
+      }
+    }
+    
+    /************************************
+     * 🧩 Download Helper (browser-safe)
+     ************************************/
+    function downloadFile(filename, content) {
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+      alert("✅ File saved successfully as " + filename);
+    }
 
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+    /************************************
+     * ▶️ KamkpaScript Interpreter Core
+     ************************************/
+    function runKamkpaScript() {
+  const code = document.getElementById('ksCode').value;
+  const lines = code.trim().split('\n');
+  const settings = {};
+
+  // Parse .ks file lines into key-value pairs
+  for (let line of lines) {
+    if (!line.includes('=')) continue;
+    let [key, value] = line.split('=');
+    key = key.trim().replace(/^p\./, 'p_');
+    key = key.replace(/-/g, '_');
+    value = value.trim().replace(/['"]/g, '');
+    settings[key] = value;
+  }
+
+  const projectType = settings.p_type;
+  let html = "";
+
+  // 🧱 Web Page Logic
+  if (projectType === 'web page') {
+    html += `
+    <html>
+      <head><title>${settings.title || ''}</title></head>
+      <body style="background:${settings.background_color || 'white'};margin:0;font-family:Arial;">
+        <h1 style="color:${settings.header_color || 'black'};text-align:center;padding:20px;">
+          ${settings.header_text || settings.title || ''}
+        </h1>
+        <p style="text-align:center;font-size:18px;">${settings.paragraph || ''}</p>
+        <footer style="background:${settings.footer_color || 'gray'};color:white;text-align:center;padding:10px;position:fixed;bottom:0;width:100%;">
+          ${settings.footer_text || ''}
+        </footer>
+      </body>
+    </html>`;
+  }
+
+  // 🤖 AI Logic Mode
+  else if (projectType === 'ai logic') {
+    html += `
+    <html>
+      <body style="font-family:monospace; background:black; color:lime; padding:20px;">
+        <h2>🤖 Kamkpas AI Logic Console</h2>
+        <p>Input: ${settings.input || 'No input provided'}</p>
+        <p>Output: ${
+          settings.input
+            ? settings.input.split('').reverse().join('')
+            : 'AI logic placeholder'
+        }</p>
+      </body>
+    </html>`;
+  }
+  
+  else if (projectType && projectType.trim().toLowerCase() === "chatbot") {
+
+  frame.srcdoc = `
+  <html>
+  <head>
+    <style>
+      body {
+        background: ${settings.background_color || "black"};
+        color: white;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      header {
+        background: #222;
+        color: lime;
+        padding: 10px;
+        text-align: center;
+        font-size: 20px;
+        border-bottom: 2px solid lime;
+      }
+      #chatArea {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .user {
+        align-self: flex-end;
+        background: lime;
+        color: black;
+        padding: 8px 12px;
+        border-radius: 15px 15px 0 15px;
+        max-width: 70%;
+      }
+      .bot {
+        align-self: flex-start;
+        background: #333;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 15px 15px 15px 0;
+        max-width: 70%;
+      }
+      #inputArea {
+        display: flex;
+        padding: 10px;
+        background: #111;
+        border-top: 1px solid #444;
+      }
+      #userMsg {
+        flex: 1;
+        background: #222;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 10px;
+        outline: none;
+      }
+      #sendBtn {
+        background: lime;
+        color: black;
+        border: none;
+        padding: 10px 15px;
+        margin-left: 10px;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <header>${settings.header_text || "AI Chatbot"}</header>
+    <div id="chatArea"></div>
+    <div id="inputArea">
+      <input id="userMsg" placeholder="Type a message..." />
+      <button id="sendBtn">Send</button>
+    </div>
+  </body>
+  </html>`;
+
+  frame.onload = () => {
+    const doc = frame.contentDocument;
+    const chatArea = doc.getElementById("chatArea");
+    const input = doc.getElementById("userMsg");
+    const sendBtn = doc.getElementById("sendBtn");
+
+    let chatMemory = []; // store the last few messages
+
+    function appendMessage(sender, message) {
+      const msgDiv = doc.createElement("div");
+      msgDiv.className = sender === "user" ? "user" : "bot";
+      msgDiv.textContent = message;
+      chatArea.appendChild(msgDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+      chatMemory.push({ sender, message });
+      if (chatMemory.length > 10) chatMemory.shift(); // keep only last 10
+    }
+
+    function generateReply(userMsg) {
+      const lowerMsg = userMsg.toLowerCase();
+
+      // Simple memory-based logic
+      if (chatMemory.some(m => m.message.toLowerCase() === lowerMsg)) {
+        return "You already said that before.";
+      }
+      if (lowerMsg.includes("how are you")) {
+        return "I'm doing fine, still learning more from you!";
+      }
+      if (lowerMsg.includes("who are you")) {
+        return "I'm Kamkpa AI, built with KamkpaScript — still growing.";
+      }
+      if (lowerMsg.includes("remember")) {
+        return "Of course, I remember our past chats!";
+      }
+
+      // If memory has a pattern of similar words
+      const lastUser = chatMemory.filter(m => m.sender === "user").slice(-2).map(m => m.message.toLowerCase());
+      if (lastUser.some(msg => msg.includes("life") && lowerMsg.includes("life"))) {
+        return "Life seems to be an important topic to you lately.";
+      }
+
+      // Default random reply
+      const replies = [
+        "That’s interesting!",
+        "Tell me more...",
+        "I see what you mean.",
+        "Hmm, continue.",
+        "You mentioned something like that earlier.",
+        "That makes sense!"
+      ];
+      return replies[Math.floor(Math.random() * replies.length)];
+    }
+
+    function sendMsg() {
+      const msg = input.value.trim();
+      if (!msg) return;
+      appendMessage("user", msg);
+      input.value = "";
+
+      setTimeout(() => {
+        const reply = generateReply(msg);
+        appendMessage("bot", reply);
+      }, 600);
+    }
+
+    sendBtn.onclick = sendMsg;
+    input.addEventListener("keypress", e => {
+      if (e.key === "Enter") sendMsg();
+    });
+  };
+}
 
 
-</script>
+
+  // 🎮 Game Logic Mode
+  else if (projectType === 'game logic') {
+    html += `
+    <html>
+      <body style="background:#223; color:#0f0; text-align:center; font-family:monospace;">
+        <h2>🎮 Kamkpas Game Logic Test</h2>
+        <p>Game Name: ${settings.title || 'Untitled Game'}</p>
+        <p>Logic: ${settings.logic || 'No game logic defined'}</p>
+        <p>Status: Running basic simulation...</p>
+      </body>
+    </html>`;
+  }
+
+  // 🌐 Web Scraper Logic
+  else if (projectType === 'scraper') {
+    html += `
+    <html>
+      <body style="background:#222; color:#0f0; font-family:monospace;">
+        <h2>🌐 KamkpaScript Web Scraper</h2>
+        <p>Target URL: ${settings.url || 'No URL provided'}</p>
+        <p>Scrape Target: ${settings.target || 'N/A'}</p>
+        <p>Note: Actual scraping not supported in browser mode, but logic simulated.</p>
+      </body>
+    </html>`;
+  }
+  
+  // 🕷️ Web Crawler Logic
+  else if (projectType === 'web crawler' || projectType === 'crawler') {
+    html += `
+    <html>
+      <body style="
+        background:${settings.background_color || '#000'};
+        color:${settings.text_color || 'lime'};
+        font-family:monospace;
+        padding:20px;
+      ">
+        <h2>🕷️ KamkpaScript Web Crawler</h2>
+        <p><strong>Project Title:</strong> ${settings.title || 'Untitled Crawler'}</p>
+        <p><strong>Target URL:</strong> ${settings.target_url || 'https://example.com'}</p>
+        <p><strong>Max Depth:</strong> ${settings.max_depth || '3'}</p>
+        <p><strong>Mode:</strong> ${settings.crawl_mode || 'links only'}</p>
+        <hr>
+        <div id="crawlResults" style="margin-top:10px;white-space:pre-line;"></div>
+
+        <script>
+          const crawlResults = document.getElementById("crawlResults");
+          const startURL = "${settings.target_url || 'https://example.com'}";
+          const links = [
+            startURL + "/about",
+            startURL + "/contact",
+            startURL + "/products",
+            startURL + "/blog",
+            startURL + "/faq"
+          ];
+
+          let i = 0;
+          function displayNextLink() {
+            if (i < links.length) {
+              const link = document.createElement('a');
+              link.href = links[i];
+link.target = "_blank"; // open real site in new tab
+link.textContent = links[i];
+link.style.color = 'aqua';
+link.onclick = () => {
+  const note = document.createElement('div');
+  note.textContent = "🕸️ Crawling: " + links[i] + " ... opening site...";
+  note.style.color = '#0f0';
+  crawlResults.appendChild(note);
+};
+              const line = document.createElement('div');
+              line.appendChild(link);
+              crawlResults.appendChild(line);
+              i++;
+              setTimeout(displayNextLink, 800);
+            } else {
+              const doneMsg = document.createElement('p');
+              doneMsg.textContent = "\\n✅ Crawling completed up to depth ${settings.max_depth || '3'}.";
+              doneMsg.style.color = 'lime';
+              crawlResults.appendChild(doneMsg);
+            }
+          }
+          displayNextLink();
+        <\/script>
+      </body>
+    </html>`;
+  }
+  
+  // 🧩 KamkpaScript Web Scraper — Clickable Data + JSON Export
+  else if (projectType === 'web scraper' || projectType === 'scraper') {
+    html += `
+    <html>
+      <body style="
+        background:${settings.background_color || '#000'};
+        color:${settings.text_color || 'lime'};
+        font-family:monospace;
+        padding:20px;
+      ">
+        <h2>🕷️ KamkpaScript Web Scraper (Clickable Version)</h2>
+        <p><strong>Project Title:</strong> ${settings.title || 'Unnamed Scraper'}</p>
+        <p><strong>Target URLs:</strong></p>
+        <ul id="urlList" style="list-style:none;padding-left:10px;"></ul>
+        <p><strong>Scrape Mode:</strong> ${settings.scrape_mode || 'contents'}</p>
+        <p><strong>Max Depth:</strong> ${settings.max_depth || '1'}</p>
+        <hr>
+        <div id="scrapeOutput" style="margin-top:10px;white-space:pre-line;"></div>
+        <button id="saveBtn" style="margin-top:20px;background:lime;color:black;padding:10px 15px;border:none;cursor:pointer;border-radius:5px;font-weight:bold;">
+          💾 Save Results (.json)
+        </button>
+
+        <script>
+          const out = document.getElementById('scrapeOutput');
+          const urlList = document.getElementById('urlList');
+          const saveBtn = document.getElementById('saveBtn');
+          const urls = ("${settings.target_url || 'https://example.com'}")
+            .split(',')
+            .map(u => u.trim())
+            .filter(Boolean);
+
+          const mode = ("${settings.scrape_mode || 'contents'}").toLowerCase();
+
+          // 🧠 Fake scraped data generator
+          function simulateScrape(url) {
+            const base = new URL(url);
+            return {
+              url: url,
+              title: "Sample Title from " + base.hostname,
+              meta: "Meta description for " + base.hostname + " — simulated content.",
+              images: [
+                base.origin + "/img/banner.jpg",
+                base.origin + "/img/logo.png"
+              ],
+              links: [
+                base.origin + "/about",
+                base.origin + "/contact"
+              ]
+            };
+          }
+
+          const allResults = [];
+
+          urls.forEach(u => {
+            const li = document.createElement('li');
+            li.innerHTML = '<a href="' + u + '" target="_blank" style="color:deepskyblue;">' + u + '</a>';
+            urlList.appendChild(li);
+          });
+
+          let current = 0;
+
+          function scrapeNext() {
+            if (current >= urls.length) {
+              out.innerHTML += "<br>✅ All scraping completed successfully.";
+              saveBtn.style.display = "inline-block";
+              return;
+            }
+
+            const u = urls[current];
+            out.innerHTML += "<br>🌐 Scraping <span style='color:deepskyblue;'>" + u + "</span><br>----------------------------<br>";
+            setTimeout(() => {
+              const data = simulateScrape(u);
+              allResults.push(data);
+
+              // 🧩 Display scraped data (Clickable)
+              out.innerHTML += "<strong>[Title]</strong> " + data.title + "<br>";
+              out.innerHTML += "<strong>[Meta]</strong> " + data.meta + "<br>";
+
+              // Clickable images
+              out.innerHTML += "<strong>[Images]</strong><br>";
+              data.images.forEach(img => {
+                out.innerHTML += '<a href="' + img + '" target="_blank" style="color:yellow;">🖼️ ' + img + '</a><br>';
+              });
+
+              // Clickable links
+              out.innerHTML += "<strong>[Links]</strong><br>";
+              data.links.forEach(link => {
+                out.innerHTML += '<a href="' + link + '" target="_blank" style="color:cyan;">🔗 ' + link + '</a><br>';
+              });
+
+              out.innerHTML += "<br>";
+
+              current++;
+              scrapeNext();
+            }, 1000);
+          }
+
+          // Start scraping simulation
+          out.innerHTML = "🔍 Starting KamkpaScript Web Scraper (Clickable Mode)...<br>";
+          scrapeNext();
+
+          // 💾 Save as JSON file
+          saveBtn.onclick = () => {
+            const blob = new Blob([JSON.stringify(allResults, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'scrape_results.json';
+            link.click();
+          };
+
+          saveBtn.style.display = "none";
+        <\/script>
+      </body>
+    </html>`;
+  }
+
+  // ❌ Unknown Type
+  else {
+    html = `<html><body><h2 style="text-align:center;">Unknown Project Type: ${projectType}</h2></body></html>`;
+  }
+
+  // Render result
+  const outputFrame = document.getElementById('outputFrame');
+  outputFrame.srcdoc = html;
+}
+  </script>
+
 </body>
 </html>
