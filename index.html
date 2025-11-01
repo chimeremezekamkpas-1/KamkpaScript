@@ -556,6 +556,63 @@ link.onclick = () => {
       </body>
     </html>`;
   }
+  
+  else if (projectType === 'search engine') {
+  html = `
+  <html>
+  <body style="background:${settings.background_color || '#000'};
+               color:${settings.text_color || 'lime'};
+               font-family:monospace; padding:20px;">
+    <h2>🔎 ${settings.title || 'Kamkpa Search Engine'}</h2>
+    <input id="query" placeholder="Search something..." style="width:80%;padding:8px;">
+    <button id="go">Search</button>
+    <div id="results" style="margin-top:20px;"></div>
+    
+    <script>
+      const resultsDiv = document.getElementById("results");
+      const goBtn = document.getElementById("go");
+      const input = document.getElementById("query");
+
+      const DATA_URL = "https://yourusername.github.io/scrape_results.json";
+
+      async function loadData() {
+        const res = await fetch(DATA_URL);
+        return await res.json();
+      }
+
+      async function searchData() {
+        const query = input.value.toLowerCase();
+        const data = await loadData();
+        const matches = data.filter(item =>
+          item.title.toLowerCase().includes(query) ||
+          item.meta.toLowerCase().includes(query) ||
+          item.url.toLowerCase().includes(query)
+        );
+
+        resultsDiv.innerHTML = "";
+        if (matches.length === 0) {
+          resultsDiv.innerHTML = "<p>No results found.</p>";
+          return;
+        }
+
+        matches.forEach(m => {
+          const card = document.createElement("div");
+          card.style.border = "1px solid lime";
+          card.style.padding = "10px";
+          card.style.margin = "10px 0";
+          card.innerHTML = \`
+            <strong>🔗 <a href="\${m.url}" target="_blank" style="color:deepskyblue;">\${m.title}</a></strong><br>
+            <small style="color:gray;">\${m.meta}</small><br>
+          \`;
+          resultsDiv.appendChild(card);
+        });
+      }
+
+      goBtn.onclick = searchData;
+    <\/script>
+  </body>
+  </html>`;
+}
 
   // ❌ Unknown Type
   else {
