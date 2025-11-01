@@ -556,6 +556,119 @@ link.onclick = () => {
       </body>
     </html>`;
   }
+  
+  // 🌍 KamkpaScript Search Engine Logic (Live)
+else if (projectType === 'search engine') {
+  html += `
+  <html>
+  <head>
+    <style>
+      body {
+        background: ${settings.background_color || 'black'};
+        color: ${settings.text_color || 'white'};
+        font-family: monospace;
+        margin: 0;
+        padding: 20px;
+      }
+      h2 {
+        text-align: center;
+        color: yellow;
+      }
+      #searchBar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      #query {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px 0 0 5px;
+      }
+      #searchBtn {
+        background: red;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 0 5px 5px 0;
+      }
+      #results {
+        margin-top: 20px;
+        line-height: 1.6;
+      }
+      .result-item {
+        background: #222;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+      .result-item a {
+        color: deepskyblue;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .result-item a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>🔎 ${settings.title || "Kamkpa Search Engine"}</h2>
+
+    <div id="searchBar">
+      <input type="text" id="query" placeholder="Type to search the web..." />
+      <button id="searchBtn">Search</button>
+    </div>
+
+    <div id="results">Enter a query to search...</div>
+
+    <script>
+      const searchBtn = document.getElementById('searchBtn');
+      const queryInput = document.getElementById('query');
+      const resultsDiv = document.getElementById('results');
+
+      async function searchWeb() {
+        const query = queryInput.value.trim();
+        if (!query) return alert("Please enter a search term.");
+
+        resultsDiv.innerHTML = "🔍 Searching DuckDuckGo for: <strong>" + query + "</strong> ...";
+
+        try {
+          const res = await fetch("https://api.duckduckgo.com/?q=" + encodeURIComponent(query) + "&format=json&no_redirect=1");
+          const data = await res.json();
+
+          let output = "";
+          if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+            data.RelatedTopics.forEach(topic => {
+              if (topic.Text && topic.FirstURL) {
+                output += \`
+                  <div class="result-item">
+                    <a href="\${topic.FirstURL}" target="_blank">\${topic.Text}</a><br>
+                    <small style="color:gray;">\${topic.FirstURL}</small>
+                  </div>\`;
+              }
+            });
+          } else {
+            output = "<p>No direct results found. Try a different keyword.</p>";
+          }
+
+          resultsDiv.innerHTML = output || "<p>No results found.</p>";
+        } catch (error) {
+          resultsDiv.innerHTML = "<p style='color:red;'>⚠️ Error fetching results: " + error.message + "</p>";
+        }
+      }
+
+      searchBtn.onclick = searchWeb;
+      queryInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter') searchWeb();
+      });
+    <\/script>
+  </body>
+  </html>`;
+}
 
   // ❌ Unknown Type
   else {
