@@ -659,7 +659,7 @@ link.onclick = () => {
     </html>`;
   }
   
-  // 🌍 KamkpaScript Search Engine Logic (Live)
+  // 🌍 KamkpaScript Search Engine Logic (Live with DuckDuckGo)
 else if (projectType === 'search engine') {
   html += `
   <html>
@@ -739,9 +739,7 @@ else if (projectType === 'search engine') {
         resultsDiv.innerHTML = "🔍 Searching DuckDuckGo for: <strong>" + query + "</strong> ...";
 
         try {
-          const res = await fetch("http://localhost:5000/search?q=kamkpa")
-.then(res => res.json())
-.then(data => console.log(data));
+          const res = await fetch("https://api.duckduckgo.com/?q=" + encodeURIComponent(query) + "&format=json&no_redirect=1");
           const data = await res.json();
 
           let output = "";
