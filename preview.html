@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>KamkpaScript Preview</title>
+<link href="style.css" rel="stylesheet"/>
+</head>
+<body>
+  <button onclick="savePreview()">💾 Save Preview</button>
+
+<iframe id="outputFrame"></iframe>
+
+<script>
+
+function savePreview() {
+  const frame = document.getElementById('outputFrame'); // your preview iframe
+  const html = frame.srcdoc;
+
+  // Create a Blob (HTML file)
+  const blob = new Blob([html], { type: 'text/html' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+
+  // Default name (you can adjust)
+  link.download = 'KamkpaPreview.html';
+  link.click();
+
+  // Cleanup
+  URL.revokeObjectURL(link.href);
+  alert("✅ Preview saved as HTML file successfully!");
+}
+
+// Retrieve code from editor
+let code = localStorage.getItem("kamkpa_script_code") || "";
+localStorage.removeItem("kamkpa_script_code");
+
+// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+//   FULL KamkpaScript Engine
+// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+function runKS(code) {
+  const lines = code.trim().split('\n');
+  const settings = {};
+
+  // Parse .ks file lines into key-value pairs
+  for (let line of lines) {
+    if (!line.includes('=')) continue;
+    let [key, value] = line.split('=');
+    key = key.trim().replace(/^p\./, 'p_');
+    key = key.replace(/-/g, '_');
+    value = value.trim().replace(/['"]/g, '');
+    settings[key] = value;
+  }
+
+  const projectType = settings.p_type;
+  let html = "";
+
+  // 🧱 WEB PAGE LOGIC
+  if (projectType === 'web page') {
+    html += `
+    <html>
+      <head>
+        <title>${settings.title || ''}</title>
+        <style>
+          body {
+            background: ${settings.background_color || 'white'};
+            margin: 0;
+            font-family: ${settings.font_family || 'Arial'};
+            color: ${settings.text_color || 'black'};
+            text-align: ${settings.text_align || 'center'};
+          }
+          h1 {
+            color: ${settings.header_color || 'black'};
+            text-align: ${settings.header_position || 'center'};
+            padding: 20px;
+            font-size: ${settings.text_size || '100px'};
+          }
+          footer {
+            background: ${settings.footer_color || 'gray'};
+            color: white;
+            text-align: ${settings.footer_position || 'center'};
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+          }
+          p {
+            font-size: ${settings.text_size || '50px'};
+            text-align: ${settings.text_align || 'center'};
+          }
+          button {
+            background: ${settings.button_color || 'black'};
+            color: white;
+            border: none;
+            padding: ${
+              settings.button_size === 'large'
+                ? '20px 40px'
+                : settings.button_size === 'small'
+                ? '5px 15px'
+                : '10px 25px'
+            };
+            border-radius: ${
+              settings.button_shape === 'circle'
+                ? '50%'
+                : settings.button_shape === 'rounded'
+                ? '20px'
+                : '0px'
+            };
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+          }
+          .btn-container {
+            text-align: ${settings.button_position || 'center'};
+            margin-top: 20px;
+          }
+          marquee {
+            font-weight: bold;
+            font-size: 20px;
+            color: ${settings.text_color || 'blue'};
+            margin: 10px 0;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>${settings.header_text || settings.title || ''}</h1>
+
+        ${
+          settings.marquee_text
+            ? `<marquee>${settings.marquee_text}</marquee>`
+            : ''
+        }
+
+        <p>${settings.paragraph || ''}</p>
+
+        ${
+          settings.image
+            ? `<div style="text-align:center;">
+                <img src="${settings.image}" alt="Image" 
+                     style="max-width:90%;border-radius:10px;margin-top:10px;">
+               </div>`
+            : ''
+        }
+
+        ${
+          settings.video
+            ? `<div style="text-align:center;margin-top:15px;">
+                <video controls style="max-width:90%;border-radius:10px;">
+                  <source src="${settings.video}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+               </div>`
+            : ''
+        }
+
+        ${
+          settings.link
+            ? `<p style="text-align:center;margin-top:15px;">
+                <a href="${settings.link}" style="color:blue;text-decoration:underline;">Go to linked page</a>
+               </p>`
+            : ''
+        }
+
+        <div class="btn-container">
+          ${
+            settings.button_text
+              ? `<button>${settings.button_text}</button>`
+              : ''
+          }
+        </div>
+
+        <footer>${settings.footer_text || ''}</footer>
+      </body>
+    </html>`;
+  }
+
+  // 🤖 AI LOGIC
+  else if (projectType === 'ai logic') {
+    html += `
+    <html>
+      <body style="font-family:monospace; background:black; color:lime; padding:20px;">
+        <h2>🤖 Kamkpas AI Logic Console</h2>
+        <p>Input: ${settings.input || 'No input provided'}</p>
+        <p>Output: ${settings.input ? settings.input.split('').reverse().join('') : 'AI logic placeholder'}</p>
+      </body>
+    </html>`;
+  }
+
+  // 💬 CHATBOT
+  else if (projectType === "chatbot") {
+    html += `
+    <html>
+    <head>
+      <style>
+        body {
+          background: ${settings.background_color || "black"};
+          color: white;
+          font-family: Arial;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          height: 100vh;
+        }
+        header {
+          background: #222;
+          color: lime;
+          padding: 10px;
+          text-align: center;
+          font-size: 20px;
+        }
+        #chatArea {
+          flex: 1;
+          overflow-y: auto;
+          padding: 15px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .user {
+          align-self: flex-end;
+          background: lime;
+          color: black;
+          padding: 8px 12px;
+          border-radius: 15px 15px 0 15px;
+        }
+        .bot {
+          align-self: flex-start;
+          background: #333;
+          color: white;
+          padding: 8px 12px;
+          border-radius: 15px 15px 15px 0;
+        }
+        #inputArea {
+          display: flex;
+          padding: 10px;
+          background: #111;
+        }
+        #userMsg {
+          flex: 1;
+          background: #222;
+          color: white;
+          border: none;
+          padding: 10px;
+        }
+        #sendBtn {
+          background: lime;
+          color: black;
+          border: none;
+          padding: 10px 15px;
+          margin-left: 10px;
+        }
+      </style>
+    </head>
+    <body>
+      <header>${settings.header_text || "AI Chatbot"}</header>
+      <div id="chatArea"></div>
+      <div id="inputArea">
+        <input id="userMsg" placeholder="Type a message..." />
+        <button id="sendBtn">Send</button>
+      </div>
+
+      <script>
+        const chatArea = document.getElementById("chatArea");
+        const input = document.getElementById("userMsg");
+        const sendBtn = document.getElementById("sendBtn");
+
+        let chatMemory = [];
+
+        function appendMessage(sender, message) {
+          const msgDiv = document.createElement("div");
+          msgDiv.className = sender;
+          msgDiv.textContent = message;
+          chatArea.appendChild(msgDiv);
+          chatArea.scrollTop = chatArea.scrollHeight;
+          chatMemory.push({ sender, message });
+          if (chatMemory.length > 10) chatMemory.shift();
+        }
+
+        function generateReply(userMsg) {
+          const lowerMsg = userMsg.toLowerCase();
+
+          if (chatMemory.some(m => m.message.toLowerCase() === lowerMsg)) {
+            return "You already said that before.";
+          }
+          if (lowerMsg.includes("how are you")) return "I'm doing fine!";
+          if (lowerMsg.includes("who are you")) return "I'm Kamkpa AI.";
+          if (lowerMsg.includes("remember")) return "Of course, I remember!";
+
+          return ["Interesting.", "Tell me more.", "Okay.", "Hmm..."][Math.floor(Math.random()*4)];
+        }
+
+        function sendMsg() {
+          const msg = input.value.trim();
+          if (!msg) return;
+          appendMessage("user", msg);
+          input.value = "";
+          setTimeout(() => {
+            appendMessage("bot", generateReply(msg));
+          }, 400);
+        }
+
+        sendBtn.onclick = sendMsg;
+        input.addEventListener("keypress", e => {
+          if (e.key === "Enter") sendMsg();
+        });
+      <\/script>
+    </body>
+    </html>`;
+  }
+
+  // 🎮 GAME LOGIC
+  else if (projectType === 'game logic') {
+    html += `
+    <html>
+      <body style="background:#223; color:#0f0; text-align:center; font-family:monospace;">
+        <h2>🎮 Kamkpas Game Logic Test</h2>
+        <p>Game Name: ${settings.title || 'Untitled Game'}</p>
+        <p>Logic: ${settings.logic || 'No game logic defined'}</p>
+        <p>Status: Running basic simulation...</p>
+      </body>
+    </html>`;
+  }
+
+  // WEB SCRAPER LOGIC
+  else if (projectType === 'scraper') {
+    html += `
+    <html>
+      <body style="background:#222; color:#0f0; font-family:monospace;">
+        <h2>🌐 KamkpaScript Web Scraper</h2>
+        <p>Target URL: ${settings.url || 'No URL provided'}</p>
+        <p>Scrape Target: ${settings.target || 'N/A'}</p>
+        <p>Note: Actual scraping not supported in browser mode.</p>
+      </body>
+    </html>`;
+  }
+
+  // 🕷️ WEB CRAWLER
+  else if (projectType === 'web crawler' || projectType === 'crawler') {
+    html += `
+    <html>
+      <body style="background:black;color:lime;font-size:50px;font-family:monospace;padding:20px;">
+        <h2>🕷️ KamkpaScript Web Crawler</h2>
+        <p><strong>Project Title:</strong> ${settings.title || 'Untitled Crawler'}</p>
+        <p><strong>Target URL:</strong> ${settings.target_url || 'https://example.com'}</p>
+        <p><strong>Max Depth:</strong> ${settings.max_depth || '3'}</p>
+        <p><strong>Mode:</strong> ${settings.crawl_mode || 'links only'}</p>
+        <hr>
+        <div id="crawlResults"></div>
+
+        <script>
+          const crawlResults = document.getElementById("crawlResults");
+          const startURL = "${settings.target_url || 'https://example.com'}";
+          const links = [
+            startURL + "/about",
+            startURL + "/contact",
+            startURL + "/products",
+            startURL + "/blog",
+            startURL + "/faq"
+          ];
+
+          let i = 0;
+          function displayNextLink() {
+            if (i < links.length) {
+              const link = document.createElement('a');
+              link.href = links[i];
+              link.target = "_blank";
+              link.textContent = links[i];
+              link.style.color = 'aqua';
+
+              const line = document.createElement('div');
+              line.appendChild(link);
+              crawlResults.appendChild(line);
+
+              i++;
+              setTimeout(displayNextLink, 800);
+            } else {
+              const done = document.createElement('p');
+              done.textContent = "Crawling completed.";
+              crawlResults.appendChild(done);
+            }
+          }
+          displayNextLink();
+        <\/script>
+      </body>
+    </html>`;
+  }
+
+  // SEARCH ENGINE
+  else if (projectType === 'search engine') {
+    html += `
+  <html>
+  <head>
+    <style>
+      body {
+        background: ${settings.background_color || 'black'};
+        color: ${settings.text_color || 'white'};
+        font-family:
+        monospace;
+        font-size: 50px;
+        margin: 0;
+        padding: 20px;
+      }
+      h2 {
+        text-align: center;
+        color: ${settings.text_color || 'yellow'};
+      }
+      #searchBar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      #query {
+        flex: 1;
+        padding: 10px;
+        font-size: 50px;
+        border: none;
+        border-radius: 5px 0 0 5px;
+      }
+      #searchBtn {
+        background: red;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 0 5px 5px 0;
+        font-size: 40px;
+      }
+      #results {
+        margin-top: 20px;
+        line-height: 1.6;
+      }
+      .result-item {
+        background: #222;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+      .result-item a {
+        color: deepskyblue;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .result-item a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>${settings.title || "Kamkpa Search Engine"}</h2>
+    <input id="query" placeholder="Search...">
+    <button id="searchBtn">Search</button>
+    <div id="results"></div>
+
+    <script>
+      const resultsDiv = document.getElementById("results");
+      const queryInput = document.getElementById("query");
+      const searchBtn = document.getElementById("searchBtn");
+
+      async function searchWeb() {
+        let q = queryInput.value.trim();
+        if (!q) return alert("Enter search.");
+
+        resultsDiv.innerHTML = "Searching...";
+
+        const res = await fetch("https://api.duckduckgo.com/?q=" + encodeURIComponent(q) + "&format=json");
+        const data = await res.json();
+
+        let out = "";
+        if (data.RelatedTopics) {
+          data.RelatedTopics.forEach(t => {
+            if (t.Text && t.FirstURL) {
+              out += "<div class='result-item'><a href='"+t.FirstURL+"' target='_blank'>"+t.Text+"</a></div>";
+            }
+          });
+        }
+        resultsDiv.innerHTML = out || "No results";
+      }
+
+      searchBtn.onclick = searchWeb;
+      queryInput.onkeypress = e => { if (e.key === "Enter") searchWeb(); }
+    <\/script>
+  </body>
+  </html>`;
+  }
+
+  // UNKNOWN PROJECT TYPE
+  else {
+    html = `<html><body><h2 style="color:red;text-align:center;">Unknown Project Type: ${projectType}</h2></body></html>`;
+  }
+
+  return html;
+}
+
+// Render to iframe
+document.getElementById("outputFrame").srcdoc = runKS(code);
+</script>
+
+</body>
+</html>
