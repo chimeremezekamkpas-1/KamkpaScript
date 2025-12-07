@@ -1,32 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KamkpaScript</title>
-    <style>
-        body {
-            background: #0d0d0d;
-            color: #00ff88;
-            font-family: monospace;
-            text-align: center;
-            padding: 50px;
-        }
-        h1 { font-size: 42px; }
-        p { font-size: 22px; opacity: 0.85; }
-        .box {
-            border: 1px solid #00ff88;
-            display: inline-block;
-            padding: 20px;
-            border-radius: 8px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>KamkpaScript Editor</title>
+<link href="style.css" rel="stylesheet"/>
 </head>
 <body>
-    <div class="box">
-        <h1>KamkpaScript</h1>
-        <p>A simple test page for verification.</p>
-        <p>© 2025 Kamkpas</p>
-    </div>
+<h2 style="text-align:center;">💻 KamkpaScript Editor</h2>
+
+<div class="controls">
+  <button onclick="document.getElementById('fileInput').click()">📂 Load</button>
+  <button onclick="saveFile()">💾 Save</button>
+  <button onclick="saveAsFile()">💾 Save As</button>
+    <button onclick="document.getElementById('fileInput').click()">
+  </div>
+
+  <input type="file" id="fileInput" accept=".ks">
+
+<textarea id="ksCode">p.type = 'web page'
+title = 'Day in a life'
+background-color = 'blue'
+header-color = 'white'
+header-text = 'Day in a life'
+paragraph = 'Welcome to my first KamkpaScript webpage.'
+footer-color = 'black'
+footer-text = '© 2025 KamkpaScript'</textarea>
+
+<button onclick="openPreview()">▶️ Run KamkpaScript</button>
+
+<script>
+
+/************************************
+     * 📁 Load .ks File from Storage
+     ************************************/
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('ksCode').value = e.target.result;
+      };
+      reader.readAsText(file);
+    });
+    
+    /************************************
+     * 💾 Save (using last file name)
+     ************************************/
+    function saveFile() {
+      const code = document.getElementById("ksCode").value;
+      downloadFile(lastFileName, code);
+    }
+
+    /************************************
+     * 💾 Save As (ask for new name)
+     ************************************/
+    function saveAsFile() {
+      const code = document.getElementById("ksCode").value;
+      const newName = prompt("Enter file name (without extension):", "myProject");
+      if (newName) {
+        lastFileName = newName.endsWith(".ks") ? newName : newName + ".ks";
+        downloadFile(lastFileName, code);
+      }
+    }
+    
+    /************************************
+     * 🧩 Download Helper (browser-safe)
+     ************************************/
+    function downloadFile(filename, content) {
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+      alert("✅ File saved successfully as " + filename);
+    }
+
+// Send textarea code to preview.html
+function openPreview() {
+    const code = document.getElementById('ksCode').value;
+    localStorage.setItem("kamkpa_script_code", code);
+    window.location.href = "preview.html";
+}
+
+
+</script>
+
 </body>
 </html>
