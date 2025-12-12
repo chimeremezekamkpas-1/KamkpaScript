@@ -136,7 +136,7 @@ Chimeremeze Kamkpas	Creator, Architect & Lead Developer
 
 ⚖️ License
 
-MIT License — You are free to use, modify, and distribute KamkpaScript, provided proper credit is given to the original creator.
+MIT License — You are free to use and distribute KamkpaScript, provided proper credit is given to the original creator.
 
 
 ---
