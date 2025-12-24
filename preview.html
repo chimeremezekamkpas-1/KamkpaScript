@@ -319,6 +319,333 @@ function runKS(code) {
       </body>
     </html>`;
   }
+  
+// 🎞️ ANIMATION LOGIC (Upgraded)
+else if (projectType === 'animation') {
+
+  const animateType = settings.animate || 'move';
+  const loopMode = settings.loop === 'true' ? 'infinite' : '1';
+  const duration = settings.duration || '3s';
+  const color = settings.object_color || 'blue';
+  const size = settings.object_size || '100px';
+  const bg = settings.canvas_color || 'black';
+  const shape = settings.object || 'box';
+
+  // 🔷 Base shape style
+  let objectShape = `
+    width: ${size};
+    height: ${size};
+    background: ${color};
+    position: relative;
+  `;
+
+  // 🟢 Shape Variants
+  if (shape === 'circle') {
+    objectShape += `border-radius: 50%;`;
+  } 
+  else if (shape === 'oval') {
+    objectShape += `border-radius: 50%; width: calc(${size} * 1.5);`;
+  } 
+  else if (shape === 'triangle') {
+    objectShape = `
+      width: 0;
+      height: 0;
+      border-left: calc(${size} / 2) solid transparent;
+      border-right: calc(${size} / 2) solid transparent;
+      border-bottom: ${size} solid ${color};
+      position: relative;
+    `;
+  } 
+  else if (shape === 'diamond') {
+    objectShape += `transform: rotate(45deg);`;
+  } 
+  else if (shape === 'line') {
+    objectShape = `
+      width: calc(${size} * 2);
+      height: 5px;
+      background: ${color};
+      position: relative;
+    `;
+  }
+  
+  // 🌀 Animation keyframes
+  let keyframes = '';
+
+  // MOVE Animation
+  if (animateType === 'move') {
+    let transform = 'translateX(0)';
+    if (settings.direction === 'right') transform = `translateX(${settings.distance || '300px'})`;
+    if (settings.direction === 'left') transform = `translateX(-${settings.distance || '300px'})`;
+    if (settings.direction === 'up') transform = `translateY(-${settings.distance || '300px'})`;
+    if (settings.direction === 'down') transform = `translateY(${settings.distance || '300px'})`;
+
+    keyframes = `
+      @keyframes animMove {
+        from { transform: translate(0, 0); }
+        to { transform: ${transform}; }
+      }
+    `;
+  }
+
+  // ROTATE Animation
+  else if (animateType === 'rotate') {
+    const angle = settings.angle || '360deg';
+    keyframes = `
+      @keyframes animRotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(${angle}); }
+      }
+    `;
+  }
+
+  // BOUNCE Animation
+  else if (animateType === 'bounce') {
+    const height = settings.height || '150px';
+    keyframes = `
+      @keyframes animBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-${height}); }
+      }
+    `;
+  }
+
+  // FADE Animation
+  else if (animateType === 'fade') {
+    const opacity = settings.opacity || '0.2';
+    keyframes = `
+      @keyframes animFade {
+        0%, 100% { opacity: 1; }
+        50% { opacity: ${opacity}; }
+      }
+    `;
+  }
+
+  // CIRCLE Animation
+  else if (animateType === 'circle') {
+    const radius = settings.radius || '200px';
+    keyframes = `
+      @keyframes animCircle {
+        0% { transform: rotate(0deg) translate(${radius}) rotate(0deg); }
+        100% { transform: rotate(360deg) translate(${radius}) rotate(-360deg); }
+      }
+    `;
+  }
+
+  // 🧩 Output HTML
+  html += `
+  <html>
+    <head>
+      <title>${settings.title || 'Animation'}</title>
+      <style>
+        body {
+          margin: 0;
+          background: ${bg};
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          overflow: hidden;
+        }
+        .object {
+          ${objectShape}
+          animation: anim${animateType.charAt(0).toUpperCase() + animateType.slice(1)} ${duration} linear ${loopMode};
+        }
+        ${keyframes}
+      </style>
+    </head>
+    <body>
+      <div class="object"></div>
+    </body>
+  </html>`;
+}
+
+// 🎞️ ANIMATION LOGIC — MULTI OBJECT UPGRADE
+else if (projectType === 'animation logic') {
+
+  const bg = settings.canvas_color || 'black';
+  const loopMode = settings.loop === 'true' ? 'infinite' : '1';
+
+  let objectsHTML = '';
+  let objectsCSS = '';
+  let keyframesCSS = '';
+
+  // Detect objects: object1, object2, object3...
+  Object.keys(settings).forEach(key => {
+    const match = key.match(/^object(\d+)$/);
+    if (!match) return;
+
+    const i = match[1];
+
+    const shape = settings[`object${i}`] || 'box';
+    const color = settings[`object${i}_color`] || 'blue';
+    const size = settings[`object${i}_size`] || '100px';
+    const animate = settings[`object${i}_animate`] || 'move';
+    const duration = settings[`object${i}_duration`] || '3s';
+    const position = settings[`object${i}_position`] || 'center';
+
+    let objectStyle = `
+      position: absolute;
+      background: ${color};
+      width: ${size};
+      height: ${size};
+    `;
+
+    // 🔷 Shape handling
+    if (shape === 'circle') objectStyle += `border-radius: 50%;`;
+    else if (shape === 'oval') objectStyle += `border-radius: 50%; width: calc(${size} * 1.5);`;
+    else if (shape === 'triangle') {
+      objectStyle = `
+        width: 0;
+        height: 0;
+        border-left: calc(${size} / 2) solid transparent;
+        border-right: calc(${size} / 2) solid transparent;
+        border-bottom: ${size} solid ${color};
+        position: absolute;
+      `;
+    }
+    else if (shape === 'diamond') objectStyle += `transform: rotate(45deg);`;
+    else if (shape === 'line') {
+      objectStyle = `
+        width: calc(${size} * 2);
+        height: 5px;
+        background: ${color};
+        position: absolute;
+      `;
+    }
+    
+    // 📍 Object position handling
+let posStyle = '';
+
+if (position === 'center') {
+  posStyle = `
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  `;
+}
+else if (position === 'up') {
+  posStyle = `
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  `;
+}
+else if (position === 'down') {
+  posStyle = `
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  `;
+}
+else if (position === 'left') {
+  posStyle = `
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  `;
+}
+else if (position === 'right') {
+  posStyle = `
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  `;
+}
+    
+    // 🌀 Animation logic
+    let animName = `anim${animate}${i}`;
+
+    if (animate === 'move') {
+      const dir = settings[`object${i}_direction`] || 'right';
+      const dist = settings[`object${i}_distance`] || '200px';
+
+      let transform = 'translateX(0)';
+      if (dir === 'right') transform = `translateX(${dist})`;
+      if (dir === 'left') transform = `translateX(-${dist})`;
+      if (dir === 'up') transform = `translateY(-${dist})`;
+      if (dir === 'down') transform = `translateY(${dist})`;
+
+      keyframesCSS += `
+        @keyframes ${animName} {
+          from { transform: translate(0,0); }
+          to { transform: ${transform}; }
+        }
+      `;
+    }
+
+    else if (animate === 'rotate') {
+      const angle = settings[`object${i}_angle`] || '360deg';
+      keyframesCSS += `
+        @keyframes ${animName} {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(${angle}); }
+        }
+      `;
+    }
+
+    else if (animate === 'bounce') {
+      const height = settings[`object${i}_height`] || '120px';
+      keyframesCSS += `
+        @keyframes ${animName} {
+          0%,100% { transform: translateY(0); }
+          50% { transform: translateY(-${height}); }
+        }
+      `;
+    }
+
+    else if (animate === 'fade') {
+      const opacity = settings[`object${i}_opacity`] || '0.3';
+      keyframesCSS += `
+        @keyframes ${animName} {
+          0%,100% { opacity: 1; }
+          50% { opacity: ${opacity}; }
+        }
+      `;
+    }
+
+    else if (animate === 'circle') {
+      const radius = settings[`object${i}_radius`] || '200px';
+      keyframesCSS += `
+        @keyframes ${animName} {
+          0% { transform: rotate(0deg) translate(${radius}) rotate(0deg); }
+          100% { transform: rotate(360deg) translate(${radius}) rotate(-360deg); }
+        }
+      `;
+    }
+
+    objectsCSS += `
+  .object-${i} {
+    ${objectStyle}
+    ${posStyle}
+    animation: ${animName} ${duration} linear ${loopMode};
+  }
+`;
+
+    objectsHTML += `<div class="object-${i}"></div>`;
+  });
+
+  html += `
+  <html>
+    <head>
+      <title>${settings.title || 'Animation Scene'}</title>
+      <style>
+        body {
+          margin: 0;
+          background: ${bg};
+          width: 100vw;
+          height: 100vh;
+          overflow: hidden;
+          position: relative;
+        }
+        ${objectsCSS}
+        ${keyframesCSS}
+      </style>
+    </head>
+    <body>
+      ${objectsHTML}
+    </body>
+  </html>`;
+}
 
   // WEB SCRAPER LOGIC
   else if (projectType === 'scraper') {
@@ -332,6 +659,210 @@ function runKS(code) {
       </body>
     </html>`;
   }
+  
+  // 🧍 HUMAN CARTOON ANIMATION
+else if (projectType === 'cartoon' && settings.character === 'human') {
+
+  const bg = settings.canvas_color || 'skyblue';
+  const height = parseInt(settings.height || '220');
+  const skin = settings.skin_color || '#f1c27d';
+  const shirt = settings.shirt_color || 'red';
+  const trouser = settings.trouser_color || 'blue';
+  const shoe = settings.shoe_color || 'black';
+  const loopMode = settings.loop === 'true' ? 'infinite' : '1';
+
+  html += `
+  <html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        background: ${bg};
+        overflow: hidden;
+        height: 100vh;
+      }
+
+      .ground {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 80px;
+        background: #333;
+      }
+
+      .human {
+        position: absolute;
+        bottom: 80px;
+        left: -100px;
+        animation: walk 1s ${loopMode}, move 5s linear ${loopMode};
+      }
+
+      .head {
+        width: 60px;
+        height: 60px;
+        background: ${skin};
+        border-radius: 50%;
+        margin: auto;
+      }
+
+      .body {
+        width: 70px;
+        height: 80px;
+        background: ${shirt};
+        margin: auto;
+      }
+
+      .arm {
+        width: 15px;
+        height: 70px;
+        background: ${skin};
+        position: absolute;
+        top: 70px;
+        animation: swing 0.5s ${loopMode};
+      }
+
+      .arm.left { left: -15px; }
+      .arm.right { right: -15px; }
+
+      .leg {
+        width: 18px;
+        height: 80px;
+        background: ${trouser};
+        position: absolute;
+        top: 150px;
+        animation: walkLeg 0.5s ${loopMode};
+      }
+
+      .leg.left { left: 15px; }
+      .leg.right { right: 15px; }
+
+      .shoe {
+        width: 25px;
+        height: 12px;
+        background: ${shoe};
+        position: absolute;
+        bottom: -12px;
+      }
+
+      @keyframes swing {
+        0% { transform: rotate(20deg); }
+        50% { transform: rotate(-20deg); }
+        100% { transform: rotate(20deg); }
+      }
+
+      @keyframes walkLeg {
+        0% { transform: rotate(-20deg); }
+        50% { transform: rotate(20deg); }
+        100% { transform: rotate(-20deg); }
+      }
+
+      @keyframes move {
+        from { left: -100px; }
+        to { left: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="human">
+      <div class="head"></div>
+      <div class="body"></div>
+      <div class="arm left"></div>
+      <div class="arm right"></div>
+      <div class="leg left"><div class="shoe"></div></div>
+      <div class="leg right"><div class="shoe"></div></div>
+    </div>
+    ${settings.ground === 'true' ? `<div class="ground"></div>` : ''}
+  </body>
+  </html>`;
+}
+
+// 🎭 CARTOON 2.5D LOGIC
+else if (projectType === 'cartoon logic') {
+
+  const bg = settings.scene_color || 'black';
+  const depth = settings.depth || '200px';
+  const perspective = settings.perspective || '800px';
+  const rotateY = settings.rotate_y || '0deg';
+  const rotateX = settings.rotate_x || '0deg';
+  const duration = settings.duration || '2s';
+  const loop = settings.loop === 'true' ? 'infinite' : '1';
+
+  html += `
+  <html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        background: ${bg};
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .scene {
+        perspective: ${perspective};
+      }
+
+      .character {
+        width: 120px;
+        height: 260px;
+        position: relative;
+        transform-style: preserve-3d;
+        transform:
+          rotateY(${rotateY})
+          rotateX(${rotateX})
+          translateZ(${depth});
+        animation: walk ${duration} ease-in-out ${loop};
+      }
+
+      /* BODY PARTS */
+      .head {
+        width: 80px;
+        height: 80px;
+        background: #f1c27d;
+        border-radius: 50%;
+        margin: auto;
+      }
+
+      .body {
+        width: 100px;
+        height: 120px;
+        background: #3498db;
+        margin: 10px auto;
+        border-radius: 20px;
+      }
+
+      .legs {
+        width: 100px;
+        height: 60px;
+        background: #2c3e50;
+        margin: auto;
+        border-radius: 10px;
+      }
+
+      @keyframes walk {
+        0% { transform: translateZ(${depth}) rotateY(${rotateY}); }
+        50% { transform: translateZ(${depth}) rotateY(calc(${rotateY} * -1)); }
+        100% { transform: translateZ(${depth}) rotateY(${rotateY}); }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="scene">
+      <div class="character">
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="legs"></div>
+      </div>
+    </div>
+  </body>
+  </html>`;
+}
+
+
 
   // 🕷️ WEB CRAWLER
   else if (projectType === 'web crawler' || projectType === 'crawler') {
@@ -482,6 +1013,8 @@ function runKS(code) {
   </body>
   </html>`;
   }
+  
+  
 
   // UNKNOWN PROJECT TYPE
   else {
